@@ -12,12 +12,12 @@ export async function getCategories(req, res) {
 }
 
 export async function postCategories(req, res) {
-  const newCategory = res.locals.category
+  const name = res.locals.category;
   try {
     await connection.query("INSERT INTO categories (name) VALUES ($1)", [
-      newCategory.name,
+      name,
     ]);
-    res.send(201)
+    res.send(201);
   } catch (e) {
     console.log(e);
     res.sendStatus(500);
