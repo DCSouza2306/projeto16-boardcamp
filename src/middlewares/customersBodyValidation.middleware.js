@@ -3,6 +3,7 @@ import customersSchema from "../models/customersSchema.js";
 
 export async function bodyCustomerValidation(req, res, next) {
   const newCustomer = req.body;
+  const id = res.locals.id;
 
   const { error } = customersSchema.validate(newCustomer, {
     abortEarly: false,
@@ -17,7 +18,7 @@ export async function bodyCustomerValidation(req, res, next) {
     newCustomer.cpf,
   ]);
 
-  if(cpfExist.rows[0]){
+  if(cpfExist.rows[0]&&!id){
    return res.status(409).send({message: "Já existe um cliente cadastrado com esse CPF"})
   }
 
