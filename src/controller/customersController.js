@@ -25,10 +25,24 @@ export async function getCustomers(req, res) {
         [search]
       );
 
-      return res.send(customers.rows)
+      return res.send(customers.rows);
     }
 
     const customers = await connection.query("SELECT * FROM customers");
+    res.send(customers.rows);
+  } catch (e) {
+    console.log(e);
+    res.sendStatus(500);
+  }
+}
+
+export async function getCustomersId(req, res) {
+  const id = res.locals.id;
+  try {
+    const customers = await connection.query(
+      "SELECT * FROM customers WHERE id = $1",
+      [id]
+    );
     res.send(customers.rows);
   } catch (e) {
     console.log(e);

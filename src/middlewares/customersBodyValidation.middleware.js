@@ -25,3 +25,17 @@ export async function bodyCustomerValidation(req, res, next) {
 
   next();
 }
+
+export async function idValidation(req, res, next){
+  const {id} = req.params;
+
+  const idExist = await connection.query("SELECT * FROM customers WHERE id = $1",[id]);
+
+  if(!idExist.rows[0]){
+    return res.sendStatus(404)
+  };
+
+  res.locals.id = id;
+
+  next();
+}
