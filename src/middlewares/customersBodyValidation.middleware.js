@@ -1,4 +1,4 @@
-import connection from "../database/database";
+import connection from "../database/database.js";
 import customersSchema from "../models/customersSchema.js";
 
 export async function bodyCustomerValidation(req, res, next) {
@@ -18,7 +18,7 @@ export async function bodyCustomerValidation(req, res, next) {
   ]);
 
   if(cpfExist.rows[0]){
-    res.status(409).send({message: "Já existe um cliente cadastrado com esse CPF"})
+   return res.status(409).send({message: "Já existe um cliente cadastrado com esse CPF"})
   }
 
   res.locals.customer = newCustomer;
