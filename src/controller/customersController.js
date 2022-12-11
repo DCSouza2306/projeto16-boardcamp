@@ -45,7 +45,7 @@ export async function getCustomersId(req, res) {
       "SELECT id,name,phone,cpf,TO_CHAR(birthday,'yyyy-mm-dd') AS birthday FROM customers WHERE id = $1",
       [id]
     );
-    res.send(customers.rows);
+    res.send(customers.rows[0]);
   } catch (e) {
     console.log(e);
     res.sendStatus(500);
