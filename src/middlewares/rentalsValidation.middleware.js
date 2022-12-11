@@ -38,3 +38,37 @@ export async function rentalsValidation(req, res, next) {
 
   next();
 }
+
+export async function returnRentalsValidation (req, res, next){
+  const {id} = req.params;
+
+  const rentalExist = await connection.query("SELECT * FROM rentals WHERE id = $1",[id])
+
+  if(!rentalExist.rows[0]){
+    return res.status(404).send({message: "Aluguel inexiste"})
+  }
+
+  if(rentalExist.rows[0].returnDate !== null){
+    return res.status(400).send({message: "Esse aluguel já foi finalizado"})
+  }
+
+  res.locals.id = id;
+  next();
+}
+
+export async function deleteRentalsValidation(req, res, next){
+  const {id} = req.params;
+
+  const rentalExist = await connection.query("SELECT * FROM rentals WHERE id = $1",[id])
+
+  if(!rentalExist.rows[0]){
+    return res.status(404).send({message: "Aluguel inexiste"})
+  }
+
+  if(rentalExist.rows[0].returnDate === null){
+    return res.status(400).send({message: "Esse aluguel não pode ser excluido"})
+  }
+
+  res.locals.id = id;
+  next();
+}
