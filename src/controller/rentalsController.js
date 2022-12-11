@@ -51,46 +51,33 @@ export async function getRentals(req, res) {
   const gameId = Number(req.query.gameId);
   try {
     const rentals = await connection.query(
-      `SELECT rentals.*,TO_CHAR(rentals."rentDate", 'yyyy-mm-dd') AS "rentDate", TO_CHAR(rentals."returnDate", 'yyyy-mm-dd') AS "returnDate", customers.name , games.name AS "gameName", games."categoryId", categories.name AS "categoryName" FROM rentals JOIN customers ON rentals."customerId" = customers.id JOIN games ON rentals."gameId" = games.id JOIN categories ON games."categoryId" = categories.id`
-    );
-
-    const rentalsSend = [];
-
-    rentals.rows.forEach((r) =>
-      rentalsSend.push({
-        id: r.id,
-        customerId: r.customerId,
-        gameId: r.gameId,
-        rentDate: r.rentDate,
-        daysRented: r.daysRented,
-        returnDate: r.returnDate,
-        originalPrice: r.originalPrice,
-        delayFee: r.delayFee,
-        customer: {
-          id: r.customerId,
-          name: r.name,
-        },
-        game: {
-          id: r.gameId,
-          name: r.gameName,
-          categoryId: r.categoryId,
-          categoryName: r.categoryName,
-        },
-      })
+      `SELECT 
+        rentals.*,
+        TO_CHAR(rentals."rentDate", 'yyyy-mm-dd') AS "rentDate", 
+        TO_CHAR(rentals."returnDate", 'yyyy-mm-dd') AS "returnDate", 
+        JSON_BUILD_OBJECT('id',customers.id,'name', customers.name) AS "customers",
+        JSON_BUILD_OBJECT('id',games.id,
+          'name', games.name,
+          'categoryId',games."categoryId",
+          'categoryName',categories.name) AS "game" 
+      FROM rentals JOIN customers 
+      ON rentals."customerId" = customers.id 
+      JOIN games ON rentals."gameId" = games.id 
+      JOIN categories ON games."categoryId" = categories.id`
     );
 
     if (customerId) {
-      const rentalsFilter = rentalsSend.filter(
+      const rentalsFilter = rentals.rows.filter(
         (r) => r.customerId === customerId
       );
       return res.send(rentalsFilter);
     }
 
     if (gameId) {
-      const rentalsFilter = rentalsSend.filter((r) => r.gameId === gameId);
+      const rentalsFilter = rentals.rows.filter((r) => r.gameId === gameId);
       return res.send(rentalsFilter);
     }
-    res.send(rentalsSend);
+    res.send(rentals.rows);
   } catch (e) {
     console.log(e);
     res.sendStatus(500);
