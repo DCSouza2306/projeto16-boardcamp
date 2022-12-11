@@ -21,14 +21,16 @@ export async function getCustomers(req, res) {
     if (cpf) {
       const search = `${cpf}%`;
       const customers = await connection.query(
-        "SELECT * FROM customers WHERE cpf LIKE $1",
+        "SELECT id,name,phone,cpf,TO_CHAR(birthday,'yyyy-mm-dd') AS birthday FROM customers WHERE cpf LIKE $1",
         [search]
       );
 
       return res.send(customers.rows);
     }
 
-    const customers = await connection.query("SELECT * FROM customers");
+    const customers = await connection.query(
+      "SELECT id,name,phone,cpf,TO_CHAR(birthday,'yyyy-mm-dd') AS birthday FROM customers"
+    );
     res.send(customers.rows);
   } catch (e) {
     console.log(e);
@@ -40,7 +42,7 @@ export async function getCustomersId(req, res) {
   const id = res.locals.id;
   try {
     const customers = await connection.query(
-      "SELECT * FROM customers WHERE id = $1",
+      "SELECT id,name,phone,cpf,TO_CHAR(birthday,'yyyy-mm-dd') AS birthday FROM customers WHERE id = $1",
       [id]
     );
     res.send(customers.rows);
